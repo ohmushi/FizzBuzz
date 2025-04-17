@@ -4,8 +4,8 @@ import java.util.List;
 public class FooBar {
 
     List<RulesPool> rulesPool = List.of(
-            new DividingRulesPool(List.of(isDivisible(3, "Foo"), isDivisible(5, "Bar"))),
-            new ContainingRulesPool(List.of(contains(3, "Foo"), contains(5, "Bar")))
+            new DefaultRulesPool(List.of(isDivisible(3, "Foo"), isDivisible(5, "Bar"))),
+            new CharacterByCharacterRulesPool(List.of(contains(3, "Foo"), contains(5, "Bar")))
     );
 
     private Rule isDivisible(int n, String res) {
@@ -48,7 +48,7 @@ interface RulesPool {
     String applyRulesFor(int n);
 }
 
-record DividingRulesPool(List<Rule> rules) implements RulesPool {
+record DefaultRulesPool(List<Rule> rules) implements RulesPool {
 
     @Override
     public String applyRulesFor(int n) {
@@ -60,7 +60,7 @@ record DividingRulesPool(List<Rule> rules) implements RulesPool {
     }
 }
 
-record ContainingRulesPool(List<Rule> rules) implements RulesPool {
+record CharacterByCharacterRulesPool(List<Rule> rules) implements RulesPool {
 
     @Override
     public String applyRulesFor(int n) {
