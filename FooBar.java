@@ -1,24 +1,18 @@
 
 import java.util.List;
-import java.util.function.Function;
 
 public class FooBar {
 
-    List<Function<Integer, String>> dividingRules = List.of(
-            isDivisible(3, "Foo"),
-            isDivisible(5, "Bar")
+    List<RulesPool> rulesPool = List.of(
+            new DividingRulesPool(List.of(isDivisible(3, "Foo"), isDivisible(5, "Bar"))),
+            new ContainingRulesPool(List.of(contains(3, "Foo"), contains(5, "Bar")))
     );
 
-    List<Function<Integer, String>> containingRules = List.of(
-            contains(3, "Foo"),
-            contains(5, "Bar")
-    );
-
-    private Function<Integer, String> isDivisible(int n, String res) {
+    private Rule isDivisible(int n, String res) {
         return (i) -> i % n == 0 ? res : "";
     }
 
-    private Function<Integer, String> contains(int n, String res) {
+    private Rule contains(int n, String res) {
         return (i) -> String.valueOf(i).contains(String.valueOf(n)) ? res : "";
     }
 
@@ -35,16 +29,48 @@ public class FooBar {
 
     private String fooBarFor(int n) {
         var sb = new StringBuilder();
-        for (var rule : this.dividingRules) {
-            sb.append(rule.apply(n));
+        for (var pool : this.rulesPool) {
+            sb.append(pool.applyRulesFor(n));
         }
 
+        return sb.isEmpty() ? String.valueOf(n) : sb.toString();
+    }
+}
+
+@FunctionalInterface
+interface Rule {
+
+    String apply(Integer i);
+}
+
+interface RulesPool {
+
+    String applyRulesFor(int n);
+}
+
+record DividingRulesPool(List<Rule> rules) implements RulesPool {
+
+    @Override
+    public String applyRulesFor(int n) {
+        var sb = new StringBuilder();
+        for (var rule : rules) {
+            sb.append(rule.apply(n));
+        }
+        return sb.toString();
+    }
+}
+
+record ContainingRulesPool(List<Rule> rules) implements RulesPool {
+
+    @Override
+    public String applyRulesFor(int n) {
+        var sb = new StringBuilder();
         for (var c : String.valueOf(n).split("")) {
-            for (var rule : this.containingRules) {
+            for (var rule : rules) {
                 sb.append(rule.apply(Integer.valueOf(c)));
             }
         }
 
-        return sb.isEmpty() ? String.valueOf(n) : sb.toString();
+        return sb.toString();
     }
 }
